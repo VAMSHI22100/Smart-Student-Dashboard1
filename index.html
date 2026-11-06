@@ -1,0 +1,2651 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudentHub | Smart Student Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+    --primary: #5145e5;
+    --bg: #f5f6fc;
+    --surface: #ffffff;
+    --text: #20243a;
+    --muted: #7d8298;
+    --line: #e9eaf2;
+    --green: #16a36a;
+    --orange: #e99a24;
+    --red: #e05260;
+    --shadow: 0 8px 28px rgba(35,38,75,.06);
+    --radius: 16px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, Arial, sans-serif;
+    font-size: 14px;
+    transition: .2s;
+}
+
+button, input, select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+body.dark {
+    --bg: #111827;
+    --surface: #1d2738;
+    --text: #f1f5f9;
+    --muted: #a5aec0;
+    --line: #344155;
+}
+
+.app {
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 250px;
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+    transition: .25s;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 2px 10px 28px;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #8b82ff);
+    color: white;
+    display: grid;
+    place-items: center;
+}
+
+.brand span {
+    color: var(--primary);
+}
+
+.nav-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    padding: 12px 12px 8px;
+}
+
+.nav {
+    display: grid;
+    gap: 5px;
+}
+
+.nav button {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    text-align: left;
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    gap: 13px;
+    align-items: center;
+    font-weight: 600;
+}
+
+.nav button:hover,
+.nav button.active {
+    background: #efefff;
+    color: var(--primary);
+}
+
+body.dark .nav button:hover,
+body.dark .nav button.active {
+    background: #302d59;
+    color: #b9b4ff;
+}
+
+.side-bottom {
+    margin-top: auto;
+}
+
+.side-profile {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 14px 8px;
+    border-top: 1px solid var(--line);
+    margin-top: 16px;
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #e7e5ff;
+    color: var(--primary);
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+}
+
+.side-profile small {
+    display: block;
+    color: var(--muted);
+    margin-top: 3px;
+}
+
+/* MAIN CONTENT */
+
+.main {
+    margin-left: 250px;
+    padding: 26px 32px 50px;
+    max-width: 1700px;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 28px;
+}
+
+.top-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.topbar h1 {
+    font-size: 23px;
+    margin-bottom: 6px;
+}
+
+.topbar p {
+    color: var(--muted);
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 12px;
+    position: relative;
+}
+
+.dot {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background: var(--red);
+    border-radius: 50%;
+    right: 8px;
+    top: 8px;
+}
+
+.menu-toggle {
+    display: none;
+}
+
+.btn {
+    border: 0;
+    border-radius: 10px;
+    padding: 11px 15px;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    background: #4035c9;
+}
+
+.btn.secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--line);
+}
+
+.btn.danger {
+    background: #fff0f1;
+    color: var(--red);
+}
+
+/* PAGES */
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.page-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.page-title h2 {
+    font-size: 19px;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.grid {
+    display: grid;
+    gap: 18px;
+}
+
+.stats {
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    margin-bottom: 20px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    min-width: 0;
+}
+
+.stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: #efefff;
+    color: var(--primary);
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 15px 0 5px;
+}
+
+.stat-note {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.dashboard-grid {
+    grid-template-columns: 1.45fr 1fr;
+    margin-bottom: 18px;
+}
+
+.card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 10px;
+}
+
+.card-head h3 {
+    font-size: 15px;
+}
+
+.chart-wrap {
+    height: 245px;
+    position: relative;
+}
+
+.progress-row {
+    margin: 16px 0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.progress {
+    height: 8px;
+    background: var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress span {
+    display: block;
+    height: 100%;
+    border-radius: 20px;
+    background: var(--primary);
+}
+
+.activity {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.activity-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #efefff;
+    color: var(--primary);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.activity small {
+    display: block;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+/* TABLES */
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 570px;
+}
+
+th, td {
+    text-align: left;
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+}
+
+th {
+    color: var(--muted);
+    font-weight: 700;
+    background: rgba(125,130,152,.05);
+}
+
+.pill {
+    display: inline-flex;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #edf8f2;
+    color: var(--green);
+}
+
+.pill.warn {
+    background: #fff6e8;
+    color: #bd7915;
+}
+
+.pill.bad {
+    background: #fff0f1;
+    color: var(--red);
+}
+
+.pill.info {
+    background: #efefff;
+    color: var(--primary);
+}
+
+/* FORMS AND MODALS */
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 13px;
+}
+
+.field label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.field input,
+.field select,
+.toolbar input,
+.toolbar select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: var(--primary);
+}
+
+.toolbar input,
+.toolbar select {
+    width: auto;
+    min-width: 170px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: #11182788;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 60;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    width: min(520px, 100%);
+    max-height: 90vh;
+    overflow: auto;
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 23px;
+}
+
+.modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.close {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 20px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 18px;
+}
+
+.empty {
+    text-align: center;
+    padding: 35px;
+    color: var(--muted);
+}
+
+/* CALENDAR AND PLANNER */
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    gap: 7px;
+}
+
+.calendar-grid div {
+    background: var(--bg);
+    border-radius: 9px;
+    min-height: 72px;
+    padding: 9px;
+    font-size: 12px;
+}
+
+.calendar-grid .day-name {
+    background: transparent;
+    min-height: auto;
+    color: var(--muted);
+    font-weight: 700;
+    text-align: center;
+}
+
+.calendar-grid .today {
+    outline: 2px solid var(--primary);
+}
+
+.calendar-grid small {
+    display: block;
+    color: var(--primary);
+    margin-top: 6px;
+    overflow-wrap: anywhere;
+}
+
+.goal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.goal label {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* NOTIFICATIONS */
+
+.notification-panel {
+    position: fixed;
+    right: 25px;
+    top: 75px;
+    width: min(340px, calc(100vw - 30px));
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    z-index: 50;
+    display: none;
+}
+
+.notification-panel.show {
+    display: block;
+}
+
+.notice {
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--line);
+    gap: 15px;
+}
+
+.settings-row p {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.switch {
+    accent-color: var(--primary);
+    width: 18px;
+    height: 18px;
+}
+
+.profile-head {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.profile-big {
+    width: 70px;
+    height: 70px;
+    font-size: 22px;
+}
+
+.focus {
+    background: linear-gradient(120deg,#5145e5,#8279fa);
+    color: white;
+}
+
+.focus .muted {
+    color: #e2e0ff;
+}
+
+.focus .btn {
+    background: white;
+    color: var(--primary);
+}
+
+.toast {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    background: #20243a;
+    color: white;
+    padding: 13px 17px;
+    border-radius: 11px;
+    z-index: 100;
+    opacity: 0;
+    transition: .25s;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+/* ACCESSIBILITY */
+
+body.high-contrast {
+    --bg: #fff;
+    --surface: #fff;
+    --text: #000;
+    --muted: #333;
+    --line: #777;
+    --primary: #1700a8;
+}
+
+body.reduce-motion * {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.large-text {
+    font-size: 16px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1100px) {
+    .stats {
+        grid-template-columns: repeat(2,1fr);
+    }
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:760px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 0 0 100vmax #10182866;
+    }
+
+    .main {
+        margin: 0;
+        padding: 18px 15px 40px;
+    }
+
+    .menu-toggle {
+        display: inline-grid;
+    }
+
+    .topbar h1 {
+        font-size: 19px;
+    }
+
+    .stats {
+        gap: 11px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .page-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .calendar-grid {
+        gap: 4px;
+    }
+
+    .calendar-grid div {
+        min-height: 58px;
+        padding: 5px;
+        font-size: 10px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:420px) {
+    .stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .stat-value {
+        font-size: 21px;
+    }
+
+    .topbar p {
+        font-size: 11px;
+    }
+}
+
+:focus-visible {
+    outline: 3px solid #958fff;
+    outline-offset: 2px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+        <div class="brand-icon">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        Student<span>Hub</span>
+    </div>
+
+    <div class="nav-label">WORKSPACE</div>
+
+    <nav class="nav">
+        <button class="active" data-page="dashboard">
+            <i class="fa-solid fa-grid-2"></i> Dashboard
+        </button>
+
+        <button data-page="attendance">
+            <i class="fa-regular fa-calendar-check"></i> Attendance
+        </button>
+
+        <button data-page="marks">
+            <i class="fa-solid fa-chart-line"></i> Performance
+        </button>
+
+        <button data-page="assignments">
+            <i class="fa-solid fa-list-check"></i> Assignments
+        </button>
+
+        <button data-page="timetable">
+            <i class="fa-regular fa-clock"></i> Timetable
+        </button>
+
+        <button data-page="calendar">
+            <i class="fa-regular fa-calendar"></i> Academic calendar
+        </button>
+
+        <button data-page="planner">
+            <i class="fa-solid fa-bullseye"></i> Study planner
+        </button>
+    </nav>
+
+    <div class="nav-label">PERSONAL</div>
+
+    <nav class="nav">
+        <button data-page="profile">
+            <i class="fa-regular fa-user"></i> My profile
+        </button>
+
+        <button data-page="settings">
+            <i class="fa-solid fa-sliders"></i> Settings
+        </button>
+    </nav>
+
+    <div class="side-bottom side-profile">
+        <div class="avatar" id="sideAvatar">VS</div>
+        <div>
+            <strong id="sideName">Vamshi</strong>
+            <small>Student account</small>
+        </div>
+    </div>
+
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+
+    <div class="top-left">
+        <button class="icon-btn menu-toggle" id="menuBtn">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div>
+            <h1 id="heading">Good morning, Vamshi 👋</h1>
+            <p id="subheading">Here's what's happening with your studies today.</p>
+        </div>
+    </div>
+
+    <div class="top-actions">
+        <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">
+            <i class="fa-regular fa-moon"></i>
+        </button>
+
+        <button class="icon-btn" id="notifyBtn" aria-label="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="dot"></span>
+        </button>
+
+        <div class="avatar" id="topAvatar">VS</div>
+    </div>
+
+</header>
+
+<!-- DASHBOARD -->
+
+<section class="page active" id="dashboard">
+
+    <div class="page-title">
+        <div>
+            <h2>Dashboard overview</h2>
+            <p class="muted">Your academic snapshot at a glance.</p>
+        </div>
+        <span class="muted" id="todayLabel"></span>
+    </div>
+
+    <div class="grid stats">
+
+        <div class="card">
+            <div class="stat-top">
+                Overall attendance
+                <span class="stat-icon"><i class="fa-solid fa-calendar-check"></i></span>
+            </div>
+            <div class="stat-value" id="dashAttendance">85%</div>
+            <div class="stat-note">
+                <span class="pill" id="attendanceStatus">On track</span>
+                across all subjects
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">
+                Current CGPA
+                <span class="stat-icon"><i class="fa-solid fa-award"></i></span>
+            </div>
+            <div class="stat-value" id="dashCgpa">8.2</div>
+            <div class="stat-note">Academic performance</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">
+                Pending assignments
+                <span class="stat-icon"><i class="fa-solid fa-file-circle-exclamation"></i></span>
+            </div>
+            <div class="stat-value" id="dashPending">3</div>
+            <div class="stat-note">Tasks to complete</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">
+                Study goals done
+                <span class="stat-icon"><i class="fa-solid fa-bullseye"></i></span>
+            </div>
+            <div class="stat-value" id="dashGoals">2/4</div>
+            <div class="stat-note">Your personal targets</div>
+        </div>
+
+    </div>
+
+    <div class="grid dashboard-grid">
+
+        <div class="card">
+            <div class="card-head">
+                <h3>Academic performance</h3>
+                <span class="pill info">By subject</span>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <h3>Attendance overview</h3>
+                <span class="muted">Subject-wise</span>
+            </div>
+            <div id="attendanceBars"></div>
+        </div>
+
+    </div>
+
+    <div class="grid dashboard-grid">
+
+        <div class="card">
+            <div class="card-head">
+                <h3>Recent activity</h3>
+            </div>
+            <div id="activityList"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <h3>Upcoming deadlines</h3>
+                <button class="btn secondary" data-go="assignments">View all</button>
+            </div>
+            <div id="upcomingList"></div>
+        </div>
+
+    </div>
+
+    <div class="card focus">
+        <div class="card-head">
+            <div>
+                <h3>Make today count</h3>
+                <p class="muted">Small steps lead to big results.</p>
+            </div>
+            <i class="fa-solid fa-wand-magic-sparkles fa-xl"></i>
+        </div>
+
+        <p>Stay consistent with your study goals and keep your assignments up to date.</p>
+
+        <button class="btn" data-go="planner">
+            Open study planner <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+
+</section>
+
+<!-- ATTENDANCE -->
+
+<section class="page" id="attendance">
+
+    <div class="page-title">
+        <div>
+            <h2>Attendance management</h2>
+            <p class="muted">Monitor class participation and attendance targets.</p>
+        </div>
+        <button class="btn" id="addAttendance">
+            <i class="fa-solid fa-plus"></i> Update record
+        </button>
+    </div>
+
+    <div class="grid stats">
+        <div class="card">
+            <div class="stat-top">Overall attendance</div>
+            <div class="stat-value" id="overallAttendance">85%</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">Classes attended</div>
+            <div class="stat-value" id="classesAttended">138</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">Classes missed</div>
+            <div class="stat-value" id="classesMissed">24</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">Below 75%</div>
+            <div class="stat-value" id="lowSubjects">1</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head">
+            <h3>Subject attendance</h3>
+            <span class="muted">Target: 75%</span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Attended</th>
+                        <th>Total classes</th>
+                        <th>Attendance</th>
+                        <th>Target guidance</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+<!-- MARKS -->
+
+<section class="page" id="marks">
+
+    <div class="page-title">
+        <div>
+            <h2>Academic performance</h2>
+            <p class="muted">Understand your strengths and areas to improve.</p>
+        </div>
+        <button class="btn" id="addMark">
+            <i class="fa-solid fa-plus"></i> Add marks
+        </button>
+    </div>
+
+    <div class="grid stats">
+        <div class="card">
+            <div class="stat-top">Average score</div>
+            <div class="stat-value" id="avgMarks">83%</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">Highest subject</div>
+            <div class="stat-value" id="bestSubject">HCI</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">Subjects tracked</div>
+            <div class="stat-value" id="markCount">4</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-top">Current CGPA</div>
+            <div class="stat-value" id="marksCgpa">8.2</div>
+        </div>
+    </div>
+
+    <div class="grid dashboard-grid">
+        <div class="card">
+            <div class="card-head"><h3>Subject-wise marks</h3></div>
+            <div class="chart-wrap"><canvas id="marksChart"></canvas></div>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>Performance distribution</h3></div>
+            <div class="chart-wrap"><canvas id="gradeChart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h3>Marks record</h3></div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Internal marks</th>
+                        <th>Maximum</th>
+                        <th>Percentage</th>
+                        <th>Grade</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="marksTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+<!-- ASSIGNMENTS -->
+
+<section class="page" id="assignments">
+
+    <div class="page-title">
+        <div>
+            <h2>Assignment manager</h2>
+            <p class="muted">Organize tasks, priorities and submission dates.</p>
+        </div>
+        <button class="btn" id="addAssignment">
+            <i class="fa-solid fa-plus"></i> New assignment
+        </button>
+    </div>
+
+    <div class="toolbar">
+        <input id="assignmentSearch" placeholder="Search assignments...">
+
+        <select id="assignmentFilter">
+            <option value="all">All statuses</option>
+            <option>Pending</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+            <option>Overdue</option>
+        </select>
+
+        <select id="priorityFilter">
+            <option value="all">All priorities</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+        </select>
+    </div>
+
+    <div class="card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Subject</th>
+                        <th>Due date</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="assignmentTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+<!-- TIMETABLE -->
+
+<section class="page" id="timetable">
+
+    <div class="page-title">
+        <div>
+            <h2>Weekly timetable</h2>
+            <p class="muted">Your classes organized by day and time.</p>
+        </div>
+        <button class="btn" id="addClass">
+            <i class="fa-solid fa-plus"></i> Add class
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-head">
+            <h3>Today's schedule</h3>
+            <span class="pill info" id="dayName"></span>
+        </div>
+        <div id="todayClasses"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+        <div class="card-head"><h3>All scheduled classes</h3></div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Time</th>
+                        <th>Subject</th>
+                        <th>Faculty</th>
+                        <th>Room</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="timetableTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+<!-- CALENDAR -->
+
+<section class="page" id="calendar">
+
+    <div class="page-title">
+        <div>
+            <h2>Academic calendar</h2>
+            <p class="muted">Keep track of important academic dates.</p>
+        </div>
+        <button class="btn" id="addEvent">
+            <i class="fa-solid fa-plus"></i> Add event
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="card-head">
+            <button class="btn secondary" id="prevMonth">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <h3 id="monthTitle"></h3>
+
+            <button class="btn secondary" id="nextMonth">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+        <div class="card-head"><h3>Upcoming events</h3></div>
+        <div id="eventList"></div>
+    </div>
+
+</section>
+
+<!-- STUDY PLANNER -->
+
+<section class="page" id="planner">
+
+    <div class="page-title">
+        <div>
+            <h2>Smart study planner</h2>
+            <p class="muted">Set goals and build consistent learning habits.</p>
+        </div>
+        <button class="btn" id="addGoal">
+            <i class="fa-solid fa-plus"></i> Add goal
+        </button>
+    </div>
+
+    <div class="grid dashboard-grid">
+
+        <div class="card">
+            <div class="card-head"><h3>Weekly goal progress</h3></div>
+            <div class="stat-value" id="goalProgress">50%</div>
+            <div class="progress">
+                <span id="goalProgressBar" style="width:50%"></span>
+            </div>
+            <p class="muted">Complete your goals to improve your progress.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h3>Study tip</h3></div>
+            <p>Try a focused 25-minute study session followed by a 5-minute break. Break large tasks into smaller steps.</p>
+            <span class="pill info">Productivity tip</span>
+        </div>
+
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h3>My learning goals</h3></div>
+        <div id="goalList"></div>
+    </div>
+
+</section>
+
+<!-- PROFILE -->
+
+<section class="page" id="profile">
+
+    <div class="page-title">
+        <div>
+            <h2>Student profile</h2>
+            <p class="muted">Manage your personal and academic information.</p>
+        </div>
+
+        <button class="btn" id="editProfile">
+            <i class="fa-solid fa-pen"></i> Edit profile
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="profile-head">
+            <div class="avatar profile-big" id="profileAvatar">VS</div>
+            <div>
+                <h2 id="profileName">Vamshi</h2>
+                <p class="muted" id="profileDept">Computer Science and Engineering</p>
+            </div>
+        </div>
+
+        <div class="grid form-grid" id="profileDetails"></div>
+    </div>
+
+</section>
+
+<!-- SETTINGS -->
+
+<section class="page" id="settings">
+
+    <div class="page-title">
+        <div>
+            <h2>Preferences & accessibility</h2>
+            <p class="muted">Customize the dashboard for your comfort.</p>
+        </div>
+    </div>
+
+    <div class="card">
+
+        <div class="settings-row">
+            <div>
+                <strong>Dark mode</strong>
+                <p>Use a darker color theme.</p>
+            </div>
+            <input class="switch" type="checkbox" id="darkSetting">
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <strong>Large text</strong>
+                <p>Increase the base text size.</p>
+            </div>
+            <input class="switch" type="checkbox" id="largeSetting">
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <strong>High contrast</strong>
+                <p>Use stronger contrast for readability.</p>
+            </div>
+            <input class="switch" type="checkbox" id="contrastSetting">
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <strong>Reduce motion</strong>
+                <p>Reduce interface transitions and animations.</p>
+            </div>
+            <input class="switch" type="checkbox" id="motionSetting">
+        </div>
+
+        <div class="settings-row">
+            <div>
+                <strong>Reset demo data</strong>
+                <p>Restore the original sample information.</p>
+            </div>
+            <button class="btn danger" id="resetData">Reset data</button>
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+</div>
+
+<!-- NOTIFICATIONS -->
+
+<div class="notification-panel" id="notificationPanel">
+
+    <div class="card-head">
+        <h3>Notifications</h3>
+        <button class="close" id="closeNotifications">&times;</button>
+    </div>
+
+    <div id="notificationList"></div>
+
+    <button class="btn secondary" id="clearNotifications">
+        Clear notifications
+    </button>
+
+</div>
+
+<!-- MODAL -->
+
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+
+    <div class="modal-box">
+
+        <div class="modal-head">
+            <h3 id="modalTitle">Add item</h3>
+            <button class="close" id="modalClose">&times;</button>
+        </div>
+
+        <form id="modalForm">
+            <div id="modalFields"></div>
+
+            <div class="form-actions">
+                <button type="button" class="btn secondary" id="cancelModal">
+                    Cancel
+                </button>
+
+                <button class="btn" type="submit">
+                    Save
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+
+/* ==================================
+   DATA AND LOCAL STORAGE
+================================== */
+
+const $ = selector => document.querySelector(selector);
+
+const today = new Date();
+
+const iso = date => new Date(date).toISOString().slice(0,10);
+
+const defaults = {
+
+    profile: {
+        name: "Vamshi",
+        enrollment: "23STUCHH010934",
+        college: "ICFAI University Hyderabad",
+        department: "Computer Science and Engineering",
+        semester: "7th Semester",
+        email: "student@example.com",
+        cgpa: 8.2
+    },
+
+    attendance: [
+        {id:1,subject:"Machine Learning",attended:34,total:40},
+        {id:2,subject:"Web Technology",attended:36,total:40},
+        {id:3,subject:"DBMS",attended:30,total:40},
+        {id:4,subject:"Human Computer Interaction",attended:38,total:40}
+    ],
+
+    marks: [
+        {id:1,subject:"Machine Learning",score:85,max:100},
+        {id:2,subject:"Web Technology",score:90,max:100},
+        {id:3,subject:"DBMS",score:78,max:100},
+        {id:4,subject:"Human Computer Interaction",score:92,max:100}
+    ],
+
+    assignments: [
+        {id:1,title:"Machine Learning project report",subject:"Machine Learning",due:iso(new Date(Date.now()+86400000*2)),priority:"High",status:"Pending"},
+        {id:2,title:"Responsive website design",subject:"Web Technology",due:iso(new Date(Date.now()+86400000*5)),priority:"Medium",status:"In Progress"},
+        {id:3,title:"HCI case study",subject:"Human Computer Interaction",due:iso(new Date(Date.now()+86400000*7)),priority:"Low",status:"Pending"},
+        {id:4,title:"Database lab record",subject:"DBMS",due:iso(new Date(Date.now()-86400000)),priority:"High",status:"Completed"}
+    ],
+
+    classes: [
+        {id:1,day:"Monday",time:"08:30 - 09:30",subject:"Machine Learning",faculty:"Dr. Kumar",room:"101"},
+        {id:2,day:"Monday",time:"09:30 - 10:30",subject:"Web Technology",faculty:"Ms. Priya",room:"102"},
+        {id:3,day:"Tuesday",time:"10:30 - 11:30",subject:"DBMS",faculty:"Dr. Rao",room:"103"},
+        {id:4,day:"Wednesday",time:"11:30 - 12:30",subject:"Human Computer Interaction",faculty:"Ms. Anitha",room:"104"},
+        {id:5,day:"Friday",time:"09:30 - 10:30",subject:"Machine Learning Lab",faculty:"Dr. Kumar",room:"Lab 2"}
+    ],
+
+    events: [
+        {id:1,title:"HCI assignment submission",date:iso(new Date(Date.now()+86400000*3)),type:"Deadline"},
+        {id:2,title:"Internal assessment",date:iso(new Date(Date.now()+86400000*10)),type:"Exam"}
+    ],
+
+    goals: [
+        {id:1,title:"Complete JavaScript revision",done:true},
+        {id:2,title:"Practice 10 aptitude questions",done:true},
+        {id:3,title:"Study Machine Learning for 1 hour",done:false},
+        {id:4,title:"Finish HCI assignment",done:false}
+    ],
+
+    activities: [
+        {text:"Web Technology assignment updated",time:"Today"},
+        {text:"Machine Learning marks reviewed",time:"Yesterday"},
+        {text:"Attendance record checked",time:"This week"}
+    ],
+
+    notifications: [
+        {id:1,text:"HCI assignment deadline is approaching.",read:false},
+        {id:2,text:"Review your attendance in DBMS.",read:false}
+    ]
+
+};
+
+function loadData() {
+    try {
+        return JSON.parse(localStorage.getItem("studentHubData")) ||
+            JSON.parse(JSON.stringify(defaults));
+    } catch {
+        return JSON.parse(JSON.stringify(defaults));
+    }
+}
+
+let data = loadData();
+let charts = {};
+let monthCursor = new Date(today.getFullYear(),today.getMonth(),1);
+let editId = null;
+let modalType = null;
+
+function save() {
+    localStorage.setItem("studentHubData",JSON.stringify(data));
+}
+
+function esc(value="") {
+    return String(value).replace(/[&<>"']/g,char=>({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+    }[char]));
+}
+
+function toast(message) {
+    const box = $("#toast");
+    box.textContent = message;
+    box.classList.add("show");
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer = setTimeout(()=>{
+        box.classList.remove("show");
+    },2600);
+}
+
+function initials(name) {
+    return name.split(/\s+/)
+        .map(word=>word[0])
+        .join("")
+        .slice(0,2)
+        .toUpperCase();
+}
+
+function pct(attended,total) {
+    return total ? Math.round(attended/total*100) : 0;
+}
+
+function grade(value) {
+    if(value>=90) return "A+";
+    if(value>=80) return "A";
+    if(value>=70) return "B";
+    if(value>=60) return "C";
+    if(value>=50) return "D";
+    return "Needs improvement";
+}
+
+function recordActivity(message) {
+    data.activities.unshift({
+        text:message,
+        time:"Just now"
+    });
+
+    data.activities = data.activities.slice(0,8);
+    save();
+}
+
+/* ==================================
+   NAVIGATION
+================================== */
+
+function go(page) {
+
+    document.querySelectorAll(".page").forEach(p=>{
+        p.classList.toggle("active",p.id===page);
+    });
+
+    document.querySelectorAll(".nav button").forEach(button=>{
+        button.classList.toggle("active",button.dataset.page===page);
+    });
+
+    const titles = {
+        dashboard:"Good day, "+data.profile.name+" 👋",
+        attendance:"Attendance management",
+        marks:"Academic performance",
+        assignments:"Assignment manager",
+        timetable:"Weekly timetable",
+        calendar:"Academic calendar",
+        planner:"Smart study planner",
+        profile:"Student profile",
+        settings:"Preferences & accessibility"
+    };
+
+    $("#heading").textContent = titles[page] || "StudentHub";
+
+    $("#subheading").textContent =
+        page==="dashboard"
+        ? "Here's what's happening with your studies today."
+        : "Manage your academic life in one place.";
+
+    $("#sidebar").classList.remove("open");
+
+    if(page==="marks") renderCharts();
+    if(page==="calendar") renderCalendar();
+}
+
+document.querySelectorAll(".nav button").forEach(button=>{
+    button.addEventListener("click",()=>{
+        go(button.dataset.page);
+    });
+});
+
+document.querySelectorAll("[data-go]").forEach(button=>{
+    button.addEventListener("click",()=>{
+        go(button.dataset.go);
+    });
+});
+
+$("#menuBtn").onclick = ()=>{
+    $("#sidebar").classList.toggle("open");
+};
+
+/* ==================================
+   THEME AND ACCESSIBILITY
+================================== */
+
+$("#themeBtn").onclick = ()=>{
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+        "studentHubDark",
+        document.body.classList.contains("dark")
+    );
+
+    syncSettings();
+    renderCharts();
+};
+
+function syncSettings() {
+
+    $("#darkSetting").checked =
+        document.body.classList.contains("dark");
+
+    $("#largeSetting").checked =
+        document.body.classList.contains("large-text");
+
+    $("#contrastSetting").checked =
+        document.body.classList.contains("high-contrast");
+
+    $("#motionSetting").checked =
+        document.body.classList.contains("reduce-motion");
+}
+
+if(localStorage.getItem("studentHubDark")==="true") {
+    document.body.classList.add("dark");
+}
+
+$("#darkSetting").onchange = event=>{
+    document.body.classList.toggle("dark",event.target.checked);
+    localStorage.setItem("studentHubDark",event.target.checked);
+    renderCharts();
+};
+
+$("#largeSetting").onchange = event=>{
+    document.body.classList.toggle("large-text",event.target.checked);
+};
+
+$("#contrastSetting").onchange = event=>{
+    document.body.classList.toggle("high-contrast",event.target.checked);
+};
+
+$("#motionSetting").onchange = event=>{
+    document.body.classList.toggle("reduce-motion",event.target.checked);
+};
+
+/* ==================================
+   NOTIFICATIONS
+================================== */
+
+function notify(message) {
+    data.notifications.unshift({
+        id:Date.now(),
+        text:message,
+        read:false
+    });
+
+    save();
+    renderNotifications();
+}
+
+function renderNotifications() {
+
+    $("#notificationList").innerHTML =
+        data.notifications.length
+        ? data.notifications.map(n=>`
+            <div class="notice">
+                ${esc(n.text)}
+                ${n.read ? "" : '<span class="pill info">New</span>'}
+            </div>
+        `).join("")
+        : '<p class="muted">You are all caught up.</p>';
+
+    $("#notifyBtn .dot").style.display =
+        data.notifications.some(n=>!n.read) ? "block" : "none";
+}
+
+$("#notifyBtn").onclick = ()=>{
+    $("#notificationPanel").classList.toggle("show");
+
+    data.notifications.forEach(n=>n.read=true);
+
+    save();
+    renderNotifications();
+};
+
+$("#closeNotifications").onclick = ()=>{
+    $("#notificationPanel").classList.remove("show");
+};
+
+$("#clearNotifications").onclick = ()=>{
+    data.notifications=[];
+    save();
+    renderNotifications();
+    toast("Notifications cleared");
+};
+
+/* ==================================
+   STUDENT PROFILE
+================================== */
+
+function renderProfile() {
+
+    const p = data.profile;
+
+    $("#sideName").textContent = p.name;
+    $("#sideAvatar").textContent = initials(p.name);
+    $("#topAvatar").textContent = initials(p.name);
+    $("#profileAvatar").textContent = initials(p.name);
+
+    $("#profileName").textContent = p.name;
+    $("#profileDept").textContent = p.department;
+
+    const fields = [
+        ["Enrollment",p.enrollment],
+        ["College",p.college],
+        ["Department",p.department],
+        ["Semester",p.semester],
+        ["Email",p.email],
+        ["CGPA",p.cgpa]
+    ];
+
+    $("#profileDetails").innerHTML = fields.map(([label,value])=>`
+        <div>
+            <small class="muted">${label}</small>
+            <p><strong>${esc(value)}</strong></p>
+        </div>
+    `).join("");
+}
+
+/* ==================================
+   DASHBOARD
+================================== */
+
+function renderDashboard() {
+
+    const totalA = data.attendance.reduce((s,x)=>s+x.attended,0);
+    const totalT = data.attendance.reduce((s,x)=>s+x.total,0);
+
+    const overall = pct(totalA,totalT);
+
+    const pending = data.assignments.filter(
+        a=>a.status!=="Completed"
+    ).length;
+
+    const done = data.goals.filter(g=>g.done).length;
+
+    $("#dashAttendance").textContent = overall+"%";
+    $("#attendanceStatus").textContent =
+        overall>=75 ? "On track" : "Needs attention";
+
+    $("#dashCgpa").textContent = data.profile.cgpa;
+    $("#dashPending").textContent = pending;
+    $("#dashGoals").textContent = done+"/"+data.goals.length;
+
+    $("#todayLabel").textContent =
+        today.toLocaleDateString(undefined,{
+            weekday:"long",
+            day:"numeric",
+            month:"long",
+            year:"numeric"
+        });
+
+    $("#attendanceBars").innerHTML =
+        data.attendance.map(a=>{
+            const p = pct(a.attended,a.total);
+
+            return `
+                <div class="progress-row">
+                    <div class="progress-info">
+                        <strong>${esc(a.subject)}</strong>
+                        <span>${p}%</span>
+                    </div>
+
+                    <div class="progress">
+                        <span style="
+                            width:${p}%;
+                            background:${p<75?'var(--red)':p<80?'var(--orange)':'var(--primary)'};
+                        "></span>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+    $("#activityList").innerHTML =
+        data.activities.slice(0,4).map(a=>`
+            <div class="activity">
+                <div class="activity-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div>
+                    ${esc(a.text)}
+                    <small>${esc(a.time)}</small>
+                </div>
+            </div>
+        `).join("");
+
+    const upcoming = data.assignments
+        .filter(a=>a.status!=="Completed")
+        .sort((a,b)=>a.due.localeCompare(b.due))
+        .slice(0,3);
+
+    $("#upcomingList").innerHTML = upcoming.length
+        ? upcoming.map(a=>`
+            <div class="activity">
+                <div class="activity-icon">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+                <div>
+                    <strong>${esc(a.title)}</strong>
+                    <small>Due ${new Date(a.due+"T00:00:00").toLocaleDateString()}</small>
+                </div>
+            </div>
+        `).join("")
+        : '<div class="empty">No pending assignments.</div>';
+
+    renderCharts();
+}
+
+/* ==================================
+   ATTENDANCE MANAGEMENT
+================================== */
+
+function renderAttendance() {
+
+    const list = data.attendance;
+
+    const attended = list.reduce((s,x)=>s+x.attended,0);
+    const total = list.reduce((s,x)=>s+x.total,0);
+
+    $("#overallAttendance").textContent = pct(attended,total)+"%";
+    $("#classesAttended").textContent = attended;
+    $("#classesMissed").textContent = total-attended;
+
+    $("#lowSubjects").textContent =
+        list.filter(x=>pct(x.attended,x.total)<75).length;
+
+    $("#attendanceTable").innerHTML = list.map(a=>{
+
+        const p = pct(a.attended,a.total);
+
+        const required = Math.max(
+            0,
+            Math.ceil((.75*a.total-a.attended)/.25)
+        );
+
+        return `
+            <tr>
+                <td><strong>${esc(a.subject)}</strong></td>
+                <td>${a.attended}</td>
+                <td>${a.total}</td>
+                <td>
+                    <span class="pill ${p<75?'bad':p<80?'warn':''}">
+                        ${p}%
+                    </span>
+                </td>
+                <td>
+                    ${p>=75
+                    ? '<span class="muted">Target reached</span>'
+                    : `Attend next ${required} consecutive classes to reach 75%`}
+                </td>
+                <td>
+                    <button class="btn secondary" onclick="editAttendance(${a.id})">
+                        Edit
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+/* ==================================
+   MARKS AND ANALYTICS
+================================== */
+
+function renderMarks() {
+
+    const list = data.marks;
+
+    const average = list.length
+        ? Math.round(
+            list.reduce((s,m)=>s+pct(m.score,m.max),0)/list.length
+        )
+        : 0;
+
+    const best = [...list].sort(
+        (a,b)=>pct(b.score,b.max)-pct(a.score,a.max)
+    )[0];
+
+    $("#avgMarks").textContent = average+"%";
+    $("#bestSubject").textContent = best ? best.subject : "—";
+    $("#markCount").textContent = list.length;
+    $("#marksCgpa").textContent = data.profile.cgpa;
+
+    $("#marksTable").innerHTML = list.map(m=>{
+
+        const p = pct(m.score,m.max);
+
+        return `
+            <tr>
+                <td>${esc(m.subject)}</td>
+                <td>${m.score}</td>
+                <td>${m.max}</td>
+                <td>${p}%</td>
+                <td>
+                    <span class="pill ${p<60?'warn':''}">
+                        ${grade(p)}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn secondary" onclick="editMark(${m.id})">Edit</button>
+                    <button class="btn danger" onclick="deleteItem('marks',${m.id})">Delete</button>
+                </td>
+            </tr>
+        `;
+    }).join("");
+
+    renderCharts();
+}
+
+function renderCharts() {
+
+    if(typeof Chart==="undefined") return;
+
+    Object.values(charts).forEach(chart=>chart.destroy());
+    charts={};
+
+    const labels = data.marks.map(m=>
+        m.subject.length>15 ? m.subject.slice(0,14)+"…" : m.subject
+    );
+
+    const values = data.marks.map(m=>pct(m.score,m.max));
+
+    const options = {
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+            legend:{display:false}
+        },
+        scales:{
+            y:{min:0,max:100}
+        }
+    };
+
+    const performance = $("#performanceChart");
+
+    if(performance) {
+        charts.performance = new Chart(performance,{
+            type:"bar",
+            data:{
+                labels,
+                datasets:[{
+                    label:"Marks %",
+                    data:values,
+                    backgroundColor:"#7168f0",
+                    borderRadius:7
+                }]
+            },
+            options
+        });
+    }
+
+    const marks = $("#marksChart");
+
+    if(marks) {
+        charts.marks = new Chart(marks,{
+            type:"bar",
+            data:{
+                labels,
+                datasets:[{
+                    label:"Marks %",
+                    data:values,
+                    backgroundColor:"#7168f0",
+                    borderRadius:7
+                }]
+            },
+            options
+        });
+    }
+
+    const gradeCanvas = $("#gradeChart");
+
+    if(gradeCanvas) {
+
+        const buckets=[0,0,0,0];
+
+        values.forEach(v=>{
+            buckets[v>=90?0:v>=80?1:v>=70?2:3]++;
+        });
+
+        charts.grade = new Chart(gradeCanvas,{
+            type:"doughnut",
+            data:{
+                labels:["A range","B range","C range","Below 70"],
+                datasets:[{
+                    data:buckets,
+                    backgroundColor:[
+                        "#16a36a",
+                        "#5145e5",
+                        "#e99a24",
+                        "#e05260"
+                    ]
+                }]
+            },
+            options:{
+                responsive:true,
+                maintainAspectRatio:false
+            }
+        });
+    }
+}
+
+/* ==================================
+   ASSIGNMENT MANAGEMENT
+================================== */
+
+function renderAssignments() {
+
+    const search = $("#assignmentSearch").value.toLowerCase();
+    const filter = $("#assignmentFilter").value;
+    const priority = $("#priorityFilter").value;
+
+    const list = data.assignments
+        .filter(a=>
+            a.title.toLowerCase().includes(search) ||
+            a.subject.toLowerCase().includes(search)
+        )
+        .filter(a=>
+            filter==="all" ||
+            (filter==="Overdue"
+                ? a.status!=="Completed" && a.due<iso(today)
+                : a.status===filter)
+        )
+        .filter(a=>priority==="all" || a.priority===priority);
+
+    $("#assignmentTable").innerHTML = list.length
+        ? list.map(a=>{
+
+            const overdue =
+                a.status!=="Completed" && a.due<iso(today);
+
+            const status = overdue ? "Overdue" : a.status;
+
+            return `
+                <tr>
+                    <td><strong>${esc(a.title)}</strong></td>
+                    <td>${esc(a.subject)}</td>
+                    <td>${a.due}</td>
+                    <td>${a.priority}</td>
+                    <td><span class="pill ${status==="Completed"?"":"warn"}">${status}</span></td>
+                    <td>
+                        <button class="btn secondary" onclick="editAssignment(${a.id})">Edit</button>
+                        <button class="btn secondary" onclick="toggleAssignment(${a.id})">
+                            ${a.status==="Completed"?"Reopen":"Complete"}
+                        </button>
+                        <button class="btn danger" onclick="deleteItem('assignments',${a.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join("")
+        : '<tr><td colspan="6"><div class="empty">No matching assignments found.</div></td></tr>';
+}
+
+$("#assignmentSearch").oninput=renderAssignments;
+$("#assignmentFilter").onchange=renderAssignments;
+$("#priorityFilter").onchange=renderAssignments;
+
+/* ==================================
+   TIMETABLE
+================================== */
+
+function renderTimetable() {
+
+    const day=today.toLocaleDateString("en-US",{weekday:"long"});
+
+    $("#dayName").textContent=day;
+
+    const todays=data.classes.filter(c=>c.day===day);
+
+    $("#todayClasses").innerHTML=todays.length
+        ? todays.map(c=>`
+            <div class="activity">
+                <div class="activity-icon">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+                <div>
+                    <strong>${esc(c.subject)}</strong>
+                    <small>${esc(c.time)} · Room ${esc(c.room)} · ${esc(c.faculty)}</small>
+                </div>
+            </div>
+        `).join("")
+        : '<p class="muted">No classes scheduled for today.</p>';
+
+    $("#timetableTable").innerHTML=data.classes.map(c=>`
+        <tr>
+            <td>${c.day}</td>
+            <td>${esc(c.time)}</td>
+            <td>${esc(c.subject)}</td>
+            <td>${esc(c.faculty)}</td>
+            <td>${esc(c.room)}</td>
+            <td>
+                <button class="btn danger" onclick="deleteItem('classes',${c.id})">Delete</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+/* ==================================
+   ACADEMIC CALENDAR
+================================== */
+
+function renderCalendar() {
+
+    const year=monthCursor.getFullYear();
+    const month=monthCursor.getMonth();
+
+    const first=new Date(year,month,1);
+    const last=new Date(year,month+1,0);
+
+    $("#monthTitle").textContent=
+        first.toLocaleDateString(undefined,{
+            month:"long",
+            year:"numeric"
+        });
+
+    let cells=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+        .map(day=>`<div class="day-name">${day}</div>`)
+        .join("");
+
+    for(let i=0;i<first.getDay();i++) {
+        cells+="<div></div>";
+    }
+
+    for(let day=1;day<=last.getDate();day++) {
+
+        const date=iso(new Date(year,month,day));
+
+        const events=data.events.filter(e=>e.date===date);
+
+        cells+=`
+            <div class="${date===iso(today)?'today':''}">
+                ${day}
+                ${events.map(e=>`<small>${esc(e.title)}</small>`).join("")}
+            </div>
+        `;
+    }
+
+    $("#calendarGrid").innerHTML=cells;
+
+    $("#eventList").innerHTML=data.events
+        .slice()
+        .sort((a,b)=>a.date.localeCompare(b.date))
+        .map(e=>`
+            <div class="activity">
+                <div class="activity-icon">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+                <div>
+                    <strong>${esc(e.title)}</strong>
+                    <small>${e.date} · ${esc(e.type)}</small>
+                </div>
+                <button class="btn danger" onclick="deleteItem('events',${e.id})">
+                    Delete
+                </button>
+            </div>
+        `).join("") || '<p class="muted">No events added.</p>';
+}
+
+$("#prevMonth").onclick=()=>{
+    monthCursor.setMonth(monthCursor.getMonth()-1);
+    renderCalendar();
+};
+
+$("#nextMonth").onclick=()=>{
+    monthCursor.setMonth(monthCursor.getMonth()+1);
+    renderCalendar();
+};
+
+/* ==================================
+   STUDY PLANNER
+================================== */
+
+function renderGoals() {
+
+    const done=data.goals.filter(g=>g.done).length;
+
+    const progress=data.goals.length
+        ? Math.round(done/data.goals.length*100)
+        : 0;
+
+    $("#goalProgress").textContent=progress+"%";
+    $("#goalProgressBar").style.width=progress+"%";
+
+    $("#goalList").innerHTML=data.goals.map(g=>`
+        <div class="goal">
+            <label>
+                <input type="checkbox"
+                    ${g.done?"checked":""}
+                    onchange="toggleGoal(${g.id})">
+
+                <span style="${g.done?'text-decoration:line-through;color:var(--muted)':''}">
+                    ${esc(g.title)}
+                </span>
+            </label>
+
+            <button class="btn danger" onclick="deleteItem('goals',${g.id})">
+                Delete
+            </button>
+        </div>
+    `).join("") || '<div class="empty">Add your first study goal.</div>';
+}
+
+/* ==================================
+   MODAL FORM GENERATOR
+================================== */
+
+function openModal(type,title,fields,item={}) {
+
+    modalType=type;
+    editId=item.id??null;
+
+    $("#modalTitle").textContent=title;
+
+    $("#modalFields").innerHTML=fields.map(field=>{
+
+        const value=item[field.name]??field.value??"";
+
+        return `
+            <div class="field">
+                <label for="f_${field.name}">${field.label}</label>
+
+                ${field.options
+                    ? `<select id="f_${field.name}" name="${field.name}" required>
+                        ${field.options.map(option=>`
+                            <option value="${esc(option)}"
+                                ${String(option)===String(value)?"selected":""}>
+                                ${esc(option)}
+                            </option>
+                        `).join("")}
+                    </select>`
+                    : `<input
+                        id="f_${field.name}"
+                        name="${field.name}"
+                        type="${field.type||"text"}"
+                        value="${esc(value)}"
+                        ${field.required===false?"":"required"}
+                        ${field.min!==undefined?`min="${field.min}"`:""}
+                        ${field.max!==undefined?`max="${field.max}"`:""}
+                        placeholder="${field.placeholder||""}">
+                    `
+                }
+            </div>
+        `;
+    }).join("");
+
+    $("#modal").classList.add("show");
+
+    setTimeout(()=>{
+        $("#modalFields input, #modalFields select")?.focus();
+    },50);
+}
+
+function closeModal() {
+    $("#modal").classList.remove("show");
+    $("#modalForm").reset();
+    editId=null;
+}
+
+$("#modalClose").onclick=closeModal;
+$("#cancelModal").onclick=closeModal;
+
+$("#modal").onclick=event=>{
+    if(event.target.id==="modal") closeModal();
+};
+
+/* ==================================
+   FORM FIELDS
+================================== */
+
+function fieldsFor(type,item={}) {
+
+    const subjects=data.attendance.map(a=>a.subject);
+
+    if(type==="attendance") return [
+        {name:"subject",label:"Subject",options:subjects,value:item.subject},
+        {name:"attended",label:"Classes attended",type:"number",min:0,value:item.attended},
+        {name:"total",label:"Total classes",type:"number",min:1,value:item.total}
+    ];
+
+    if(type==="marks") return [
+        {name:"subject",label:"Subject",value:item.subject,placeholder:"Subject name"},
+        {name:"score",label:"Marks obtained",type:"number",min:0,value:item.score},
+        {name:"max",label:"Maximum marks",type:"number",min:1,value:item.max||100}
+    ];
+
+    if(type==="assignments") return [
+        {name:"title",label:"Assignment title",value:item.title},
+        {name:"subject",label:"Subject",options:subjects,value:item.subject},
+        {name:"due",label:"Due date",type:"date",value:item.due},
+        {name:"priority",label:"Priority",options:["High","Medium","Low"],value:item.priority||"Medium"},
+        {name:"status",label:"Status",options:["Pending","In Progress","Completed"],value:item.status||"Pending"}
+    ];
+
+    if(type==="classes") return [
+        {name:"day",label:"Day",options:["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],value:item.day||"Monday"},
+        {name:"time",label:"Time",value:item.time,placeholder:"09:00 - 10:00"},
+        {name:"subject",label:"Subject",value:item.subject},
+        {name:"faculty",label:"Faculty",value:item.faculty},
+        {name:"room",label:"Room",value:item.room}
+    ];
+
+    if(type==="events") return [
+        {name:"title",label:"Event title",value:item.title},
+        {name:"date",label:"Date",type:"date",value:item.date},
+        {name:"type",label:"Event type",options:["Deadline","Exam","Project","College event"],value:item.type||"Deadline"}
+    ];
+
+    if(type==="goals") return [
+        {name:"title",label:"Study goal",value:item.title}
+    ];
+
+    if(type==="profile") return [
+        {name:"name",label:"Full name",value:item.name},
+        {name:"enrollment",label:"Enrollment number",value:item.enrollment},
+        {name:"college",label:"College",value:item.college},
+        {name:"department",label:"Department",value:item.department},
+        {name:"semester",label:"Semester",value:item.semester},
+        {name:"email",label:"Email",type:"email",value:item.email},
+        {name:"cgpa",label:"CGPA (0–10)",type:"number",min:0,max:10,value:item.cgpa}
+    ];
+
+    return [];
+}
+
+/* ==================================
+   ADD AND EDIT BUTTONS
+================================== */
+
+function add(type,title) {
+    openModal(type,title,fieldsFor(type));
+}
+
+function edit(type,id) {
+
+    const item=data[type].find(x=>x.id===id);
+
+    if(item) {
+        openModal(
+            type,
+            "Edit "+type.slice(0,-1),
+            fieldsFor(type,item),
+            item
+        );
+    }
+}
+
+$("#addAttendance").onclick=()=>add("attendance","Update attendance");
+$("#addMark").onclick=()=>add("marks","Add marks");
+$("#addAssignment").onclick=()=>add("assignments","New assignment");
+$("#addClass").onclick=()=>add("classes","Add class");
+$("#addEvent").onclick=()=>add("events","Add academic event");
+$("#addGoal").onclick=()=>add("goals","Add study goal");
+
+$("#editProfile").onclick=()=>{
+    openModal("profile","Edit student profile",fieldsFor("profile",data.profile));
+};
+
+window.editAttendance=id=>edit("attendance",id);
+window.editMark=id=>edit("marks",id);
+window.editAssignment=id=>edit("assignments",id);
+
+/* ==================================
+   SAVE FORM DATA
+================================== */
+
+$("#modalForm").onsubmit=event=>{
+
+    event.preventDefault();
+
+    const obj=Object.fromEntries(
+        new FormData(event.target).entries()
+    );
+
+    for(const key of ["attended","total","score","max","cgpa"]) {
+        if(obj[key]!==undefined) {
+            obj[key]=Number(obj[key]);
+        }
+    }
+
+    if(obj.attended!==undefined &&
+       (obj.attended>obj.total || obj.total<1)) {
+        toast("Attended classes cannot exceed total classes.");
+        return;
+    }
+
+    if(obj.score!==undefined &&
+       (obj.score>obj.max || obj.score<0)) {
+        toast("Please enter valid marks.");
+        return;
+    }
+
+    if(obj.cgpa!==undefined &&
+       (obj.cgpa<0 || obj.cgpa>10)) {
+        toast("CGPA must be between 0 and 10.");
+        return;
+    }
+
+    if(modalType==="profile") {
+
+        data.profile={
+            ...data.profile,
+            ...obj
+        };
+
+    } else if(editId!==null) {
+
+        const array=data[modalType];
+
+        const index=array.findIndex(x=>x.id===editId);
+
+        if(index>=0) {
+            array[index]={
+                ...array[index],
+                ...obj
+            };
+        }
+
+    } else {
+
+        obj.id=Date.now();
+
+        if(modalType==="goals") {
+            obj.done=false;
+        }
+
+        data[modalType].push(obj);
+    }
+
+    recordActivity(
+        (editId!==null?"Updated ":"Added ")+modalType.slice(0,-1)
+    );
+
+    save();
+    closeModal();
+    renderAll();
+
+    toast("Changes saved successfully");
+};
+
+/* ==================================
+   DELETE RECORDS
+================================== */
+
+window.deleteItem=(type,id)=>{
+
+    if(!confirm("Are you sure you want to delete this item?")) {
+        return;
+    }
+
+    data[type]=data[type].filter(item=>item.id!==id);
+
+    recordActivity("Deleted an item from "+type);
+
+    save();
+    renderAll();
+
+    toast("Item deleted");
+};
+
+/* ==================================
+   ASSIGNMENT STATUS
+================================== */
+
+window.toggleAssignment=id=>{
+
+    const assignment=data.assignments.find(x=>x.id===id);
+
+    if(assignment) {
+
+        assignment.status=
+            assignment.status==="Completed"
+            ? "Pending"
+            : "Completed";
+
+        recordActivity("Assignment status changed: "+assignment.title);
+
+        save();
+        renderAll();
+
+        toast("Assignment updated");
+    }
+};
+
+/* ==================================
+   STUDY GOAL STATUS
+================================== */
+
+window.toggleGoal=id=>{
+
+    const goal=data.goals.find(x=>x.id===id);
+
+    if(goal) {
+
+        goal.done=!goal.done;
+
+        save();
+
+        renderGoals();
+        renderDashboard();
+
+        toast("Study goal updated");
+    }
+};
+
+/* ==================================
+   RESET DATA
+================================== */
+
+$("#resetData").onclick=()=>{
+
+    if(confirm("Reset all information to original sample data?")) {
+
+        data=JSON.parse(JSON.stringify(defaults));
+
+        save();
+        renderAll();
+
+        toast("Demo data restored");
+    }
+};
+
+/* ==================================
+   RENDER ALL MODULES
+================================== */
+
+function renderAll() {
+
+    renderProfile();
+    renderDashboard();
+    renderAttendance();
+    renderMarks();
+    renderAssignments();
+    renderTimetable();
+    renderCalendar();
+    renderGoals();
+    renderNotifications();
+    syncSettings();
+}
+
+/* ==================================
+   INITIALIZE APPLICATION
+================================== */
+
+function init() {
+
+    const hour=new Date().getHours();
+
+    const greeting=
+        hour<12 ? "Good morning, " :
+        hour<18 ? "Good afternoon, " :
+        "Good evening, ";
+
+    $("#heading").textContent=
+        greeting+data.profile.name+" 👋";
+
+    $("#todayLabel").textContent=
+        today.toLocaleDateString(undefined,{
+            weekday:"long",
+            day:"numeric",
+            month:"long",
+            year:"numeric"
+        });
+
+    $("#themeBtn").innerHTML=
+        document.body.classList.contains("dark")
+        ? '<i class="fa-regular fa-sun"></i>'
+        : '<i class="fa-regular fa-moon"></i>';
+
+    renderAll();
+}
+
+init();
+
+</script>
+
+</body>
+</html>
